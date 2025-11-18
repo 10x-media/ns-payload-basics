@@ -18,6 +18,8 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { payloadAiPlugin } from '@ai-stack/payloadcms'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Vendors } from './collections/Vendors'
+import { stripePlugin } from '@payloadcms/plugin-stripe'
+import { InvoiceDocuments } from './collections/orders/InvoiceDocuments'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -34,7 +36,7 @@ export default buildConfig({
     defaultFromName: 'Sandro Wegmann',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Media, Pages, Products, ProductImages, Orders, Users, Vendors],
+  collections: [Media, Pages, Products, ProductImages, Orders, Users, Vendors, InvoiceDocuments],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -54,6 +56,9 @@ export default buildConfig({
         },
         'product-images': {
           prefix: 'product-images',
+        },
+        'invoice-documents': {
+          prefix: 'invoice-documents',
         },
       },
       bucket: process.env.S3_BUCKET || '',
@@ -79,6 +84,22 @@ export default buildConfig({
           enabled: true,
         },
       },
+    }),
+
+    stripePlugin({
+      stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+      stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET,
+      webhooks: {
+        'payment_intent.succeeded': ({ event, stripe, stripeConfig }) => {
+          // do something...
+          console.log('payment intent succeeded!')
+        },
+      },
+      // NOTE: you can also catch all Stripe webhook events and handle the event types yourself
+      // webhooks: (event, stripe, stripeConfig) => {
+      //   console.log('hello world')
+      //   console.log(event)
+      // },
     }),
   ],
 })

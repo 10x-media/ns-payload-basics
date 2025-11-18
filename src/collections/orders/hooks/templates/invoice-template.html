@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Invoice <%= order.orderNumber %>
+    </title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        .invoice-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+
+        .company-info {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .invoice-meta {
+            text-align: right;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .two-columns {
+            display: flex;
+            gap: 32px;
+            font-size: 14px;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .box {
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            padding: 12px 14px;
+            background: #fafafa;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            background: #fafafa;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #555;
+        }
+
+        tfoot td {
+            border-bottom: none;
+            font-size: 14px;
+        }
+
+        tfoot tr:last-child td {
+            font-weight: 600;
+            border-top: 1px solid #ddd;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .muted {
+            color: #777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="company-info">
+                <h1>Invoice</h1>
+                <div class="muted">Your Company Name</div>
+                <div class="muted">Street 123 · 12345 City</div>
+                <div class="muted">info@yourcompany.com</div>
+            </div>
+            <div class="invoice-meta">
+                <div><strong>Invoice No:</strong>
+                    <%= order.orderNumber %>
+                </div>
+                <div><strong>Status:</strong>
+                    <%= order.status %>
+                </div>
+                <div><strong>Payment:</strong>
+                    <%= order.paymentStatus %>
+                </div>
+                <div>
+                    <strong>Date:</strong>
+                    <!-- format server-side if you want, or pass a preformatted date -->
+                    <%= order.createdAtFormatted || order.createdAt %>
+                </div>
+            </div>
+        </header>
+
+        <!-- Customer & Shipping -->
+        <section class="section">
+            <div class="two-columns">
+                <div class="column">
+                    <div class="section-title">Billed To</div>
+                    <div class="box">
+                        <div><strong>
+                                <%= order.customer.name %>
+                            </strong></div>
+                        <div>
+                            <%= order.customer.email %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="section-title">Shipping Address</div>
+                    <div class="box">
+                        <div>
+                            <%= order.shippingAddress.line1 %>
+                        </div>
+                        <div>
+                            <%= order.shippingAddress.postalCode %>
+                                <%= order.shippingAddress.city %>
+                        </div>
+                        <div>
+                            <%= order.shippingAddress.country %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Line Items -->
+        <section class="section">
+            <div class="section-title">Order Items</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>SKU / Vendor</th>
+                        <th class="text-right">Qty</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.lineItems.forEach(function (item) { %>
+                        <tr>
+                            <td>
+                                <strong>
+                                    <%= item.productSnapshot?.name || item.product?.name %>
+                                </strong>
+                                <% if (item.product?.description) { %>
+                                    <div class="muted">
+                                        <%= item.product.description %>
+                                    </div>
+                                    <% } %>
+                            </td>
+                            <td>
+                                <% if (item.product?.metadata?.sku) { %>
+                                    <div>SKU: <%= item.product.metadata.sku %>
+                                    </div>
+                                    <% } %>
+                                        <% if (item.product?.metadata?.vendor) { %>
+                                            <div class="muted">
+                                                <%= item.product.metadata.vendor %>
+                                            </div>
+                                            <% } %>
+                            </td>
+                            <td class="text-right">
+                                <%= item.quantity %>
+                            </td>
+                            <td class="text-right">
+                                <%= item.productSnapshot?.currency || "USD" %>
+                                    <%= item.unitPrice.toFixed ? item.unitPrice.toFixed(2) : item.unitPrice %>
+                            </td>
+                            <td class="text-right">
+                                <%= item.productSnapshot?.currency || "USD" %>
+                                    <%= item.subtotal.toFixed ? item.subtotal.toFixed(2) : item.subtotal %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-right">Subtotal</td>
+                        <td class="text-right">
+                            <%= order.lineItems[0]?.productSnapshot?.currency || "USD" %>
+                                <%= order.subtotal.toFixed ? order.subtotal.toFixed(2) : order.subtotal %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-right">Total</td>
+                        <td class="text-right">
+                            <%= order.lineItems[0]?.productSnapshot?.currency || "USD" %>
+                                <%= order.total.toFixed ? order.total.toFixed(2) : order.total %>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+
+        <!-- Footer -->
+        <section class="section">
+            <p class="muted">
+                Thank you for your order.
+                Please include the invoice number in your payment reference.
+            </p>
+        </section>
+    </div>
+</body>
+
+</html>

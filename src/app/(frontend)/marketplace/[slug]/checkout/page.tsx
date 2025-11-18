@@ -87,27 +87,36 @@ export default async function CheckoutPage({ params }: { params: Params }) {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-6 py-12">
-      <Link href={`/marketplace/${product.slug}`} className="text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        href={`/marketplace/${product.slug}`}
+        className="text-sm text-muted-foreground hover:text-foreground"
+      >
         ← Back to product
       </Link>
       <div className="grid gap-8 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Order summary</CardTitle>
-            <p className="text-sm text-muted-foreground">Confirm product details before checkout.</p>
+            <p className="text-sm text-muted-foreground">
+              Confirm product details before checkout.
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{product.name}</p>
-                {product.shortDescription && <p className="text-sm text-muted-foreground">{product.shortDescription}</p>}
+                {product.shortDescription && (
+                  <p className="text-sm text-muted-foreground">{product.shortDescription}</p>
+                )}
               </div>
               <Badge>{formatPrice(product.price, product.currency ?? 'USD')}</Badge>
             </div>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt>Status</dt>
-                <dd className="text-muted-foreground">{product.status === 'active' ? 'Ready to ship' : 'Preview'}</dd>
+                <dd className="text-muted-foreground">
+                  {product.status === 'active' ? 'Ready to ship' : 'Preview'}
+                </dd>
               </div>
               <div className="flex justify-between">
                 <dt>Inventory</dt>
@@ -120,7 +129,9 @@ export default async function CheckoutPage({ params }: { params: Params }) {
         <Card>
           <CardHeader>
             <CardTitle>Checkout</CardTitle>
-            <p className="text-sm text-muted-foreground">No payment gateway yet—this demo just creates an order.</p>
+            <p className="text-sm text-muted-foreground">
+              No payment gateway yet—this demo just creates an order.
+            </p>
           </CardHeader>
           <form action={createOrder}>
             <input type="hidden" name="productSlug" value={product.slug} />
@@ -192,7 +203,8 @@ export default async function CheckoutPage({ params }: { params: Params }) {
                 Place order
               </Button>
               <p className="text-xs text-muted-foreground">
-                By submitting, we will store your order inside the Payload `orders` collection for fulfillment.
+                By submitting, we will store your order inside the Payload `orders` collection for
+                fulfillment.
               </p>
             </CardFooter>
           </form>
@@ -201,9 +213,7 @@ export default async function CheckoutPage({ params }: { params: Params }) {
     </div>
   )
 }
-
 function formatPrice(value?: number | null, currency = 'USD') {
   if (value == null) return '—'
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value)
 }
-

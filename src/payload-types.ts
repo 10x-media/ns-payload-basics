@@ -76,6 +76,7 @@ export interface Config {
     orders: Order;
     users: User;
     vendors: Vendor;
+    'invoice-documents': InvoiceDocument;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -91,6 +92,7 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     vendors: VendorsSelect<false> | VendorsSelect<true>;
+    'invoice-documents': InvoiceDocumentsSelect<false> | InvoiceDocumentsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -302,6 +304,7 @@ export interface ProductImage {
  */
 export interface Order {
   id: string;
+  invoice?: (string | null) | InvoiceDocument;
   orderNumber: string;
   status?: ('pending' | 'paid' | 'shipped' | 'cancelled') | null;
   paymentStatus?: ('unpaid' | 'paid' | 'refunded') | null;
@@ -334,6 +337,25 @@ export interface Order {
   total: number;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoice-documents".
+ */
+export interface InvoiceDocument {
+  id: string;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -480,6 +502,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'vendors';
         value: string | Vendor;
+      } | null)
+    | ({
+        relationTo: 'invoice-documents';
+        value: string | InvoiceDocument;
       } | null)
     | ({
         relationTo: 'payload-mcp-api-keys';
@@ -677,6 +703,7 @@ export interface ProductImagesSelect<T extends boolean = true> {
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
+  invoice?: T;
   orderNumber?: T;
   status?: T;
   paymentStatus?: T;
@@ -763,6 +790,24 @@ export interface VendorsSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoice-documents_select".
+ */
+export interface InvoiceDocumentsSelect<T extends boolean = true> {
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
