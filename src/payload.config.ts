@@ -20,6 +20,7 @@ import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Vendors } from './collections/Vendors'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
 import { InvoiceDocuments } from './collections/orders/InvoiceDocuments'
+import { handleCheckoutSessionCompleted } from './collections/orders/hooks/handleStripeWebhook'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -90,16 +91,10 @@ export default buildConfig({
       stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
       stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET,
       webhooks: {
-        'payment_intent.succeeded': ({ event, stripe, stripeConfig }) => {
-          // do something...
-          console.log('payment intent succeeded!')
+        'checkout.session.completed': async ({ event, stripe, payload }) => {
+          await handleCheckoutSessionCompleted({ event, stripe, payload })
         },
       },
-      // NOTE: you can also catch all Stripe webhook events and handle the event types yourself
-      // webhooks: (event, stripe, stripeConfig) => {
-      //   console.log('hello world')
-      //   console.log(event)
-      // },
     }),
   ],
 })

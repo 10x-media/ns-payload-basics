@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { revalidatePath } from 'next/cache'
 
 import { HeroSection } from '@/blocks/HeroSection'
 import { MarketplaceShowcase } from '@/blocks/MarketplaceShowcase'
@@ -17,6 +18,22 @@ export const Pages: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [
+      ({ doc }) => {
+        const path = doc.slug === 'home' ? '/' : `/${doc.slug}`
+        revalidatePath(path)
+        return doc
+      },
+    ],
+    afterDelete: [
+      ({ doc }) => {
+        const path = doc.slug === 'home' ? '/' : `/${doc.slug}`
+        revalidatePath(path)
+        return doc
+      },
+    ],
   },
   fields: [
     {

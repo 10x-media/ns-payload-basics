@@ -5,7 +5,6 @@ import { getPayload } from 'payload'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Product } from '@/payload-types'
 import config from '@/payload.config'
 
 type Params = Promise<{ slug: string }>
@@ -29,60 +28,28 @@ export default async function CheckoutPage({ params }: { params: Params }) {
     redirect('/marketplace?missingProduct=1')
   }
 
-  async function createOrder(formData: FormData) {
+  async function startCheckout(formData: FormData) {
     'use server'
 
-    const payloadInstance = await getPayload({ config: await config })
-    const quantity = Number(formData.get('quantity') ?? 1)
-    const email = String(formData.get('email') ?? '')
-    const name = String(formData.get('name') ?? '')
-    const line1 = String(formData.get('line1') ?? '')
-    const city = String(formData.get('city') ?? '')
-    const country = String(formData.get('country') ?? '')
-    const postalCode = String(formData.get('postalCode') ?? '')
-
     const productSlug = String(formData.get('productSlug') ?? '')
-    const fetched = await payloadInstance
-      .find({
-        collection: 'products',
-        limit: 1,
-        where: { slug: { equals: productSlug } },
-      })
-      .then((res) => res.docs?.[0])
-      .catch(() => null)
+    const quantity = Number(formData.get('quantity') ?? 1)
 
-    if (!fetched) {
-      redirect('/marketplace?missingProduct=1')
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/checkout/create-session`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productSlug, quantity }),
+      },
+    )
+
+    const data = await response.json()
+
+    if (!response.ok || !data.url) {
+      redirect(`/marketplace/${productSlug}/checkout?error=1`)
     }
 
-    const subtotal = (fetched.price ?? 0) * quantity
-    const order = await payloadInstance.create({
-      collection: 'orders',
-      data: {
-        status: 'pending',
-        paymentStatus: 'unpaid',
-        customer: { name, email },
-        shippingAddress: { line1, city, country, postalCode },
-        lineItems: [
-          {
-            product: fetched.id,
-            productSnapshot: {
-              name: fetched.name,
-              price: fetched.price ?? 0,
-              currency: fetched.currency ?? 'USD',
-            },
-            quantity,
-            unitPrice: fetched.price ?? 0,
-            subtotal,
-          },
-        ],
-        subtotal,
-        total: subtotal,
-        notes: 'Created via marketplace checkout.',
-      },
-    })
-
-    redirect(`/marketplace/thank-you?order=${order.orderNumber}`)
+    redirect(data.url)
   }
 
   return (
@@ -105,11 +72,11 @@ export default async function CheckoutPage({ params }: { params: Params }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{product.name}</p>
-                {product.shortDescription && (
-                  <p className="text-sm text-muted-foreground">{product.shortDescription}</p>
+                {product.description && (
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
                 )}
               </div>
-              <Badge>{formatPrice(product.price, product.currency ?? 'USD')}</Badge>
+              <Badge>{formatPrice(product.price)}</Badge>
             </div>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -129,30 +96,11 @@ export default async function CheckoutPage({ params }: { params: Params }) {
         <Card>
           <CardHeader>
             <CardTitle>Checkout</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              No payment gateway yet—this demo just creates an order.
-            </p>
+            <p className="text-sm text-muted-foreground">Secure payment powered by Stripe.</p>
           </CardHeader>
-          <form action={createOrder}>
+          <form action={startCheckout}>
             <input type="hidden" name="productSlug" value={product.slug} />
             <CardContent className="space-y-4">
-              <label className="flex flex-col gap-2 text-sm">
-                Full name
-                <input
-                  name="name"
-                  required
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm">
-                Email
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </label>
               <label className="flex flex-col gap-2 text-sm">
                 Quantity
                 <input
@@ -163,48 +111,13 @@ export default async function CheckoutPage({ params }: { params: Params }) {
                   className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
-              <label className="flex flex-col gap-2 text-sm">
-                Address line
-                <input
-                  name="line1"
-                  required
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <label className="flex flex-col gap-2 text-sm">
-                  City
-                  <input
-                    name="city"
-                    required
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
-                </label>
-                <label className="flex flex-col gap-2 text-sm">
-                  Country
-                  <input
-                    name="country"
-                    required
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
-                </label>
-                <label className="flex flex-col gap-2 text-sm">
-                  Postal code
-                  <input
-                    name="postalCode"
-                    required
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
-                </label>
-              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
               <Button type="submit" className="w-full">
-                Place order
+                Continue to payment
               </Button>
               <p className="text-xs text-muted-foreground">
-                By submitting, we will store your order inside the Payload `orders` collection for
-                fulfillment.
+                You'll be redirected to Stripe's secure checkout page.
               </p>
             </CardFooter>
           </form>
@@ -213,7 +126,8 @@ export default async function CheckoutPage({ params }: { params: Params }) {
     </div>
   )
 }
-function formatPrice(value?: number | null, currency = 'USD') {
+
+function formatPrice(value?: number | null) {
   if (value == null) return '—'
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value)
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
 }
