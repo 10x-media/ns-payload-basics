@@ -28,7 +28,8 @@ const FALLBACK_PRODUCTS: MarketplaceProduct[] = [
     price: 129,
     currency: 'USD',
     shortDescription: 'Hand-blown glass shade, walnut base, and dimmable controls.',
-    imageUrl: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=600&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'placeholder-2',
@@ -37,7 +38,8 @@ const FALLBACK_PRODUCTS: MarketplaceProduct[] = [
     price: 89,
     currency: 'USD',
     shortDescription: 'Barista-grade brewing ritual crafted by small kilns.',
-    imageUrl: 'https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=600&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'placeholder-3',
@@ -46,7 +48,8 @@ const FALLBACK_PRODUCTS: MarketplaceProduct[] = [
     price: 1380,
     currency: 'USD',
     shortDescription: 'Powder-coated frame with cable channel and oak desktop.',
-    imageUrl: 'https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?auto=format&fit=crop&w=1200&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?auto=format&fit=crop&w=1200&q=80',
   },
 ]
 
@@ -86,7 +89,9 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
           Marketplace
         </Badge>
         <div className="space-y-2">
-          <h1 className="text-4xl font-semibold tracking-tight">Curated products built by independent vendors</h1>
+          <h1 className="text-4xl font-semibold tracking-tight">
+            Curated products built by independent vendors
+          </h1>
           <p className="text-muted-foreground">
             Discover in-stock inventory from vetted makers. Search by product name, tag, or story.
           </p>
@@ -120,7 +125,11 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
               <div className="relative h-56 w-full overflow-hidden rounded-t-lg bg-muted">
                 {product.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
                     Image coming soon
@@ -138,7 +147,9 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
                 )}
               </CardHeader>
               <CardContent>
-                <p className="text-lg font-semibold">{formatPrice(product.price, product.currency)}</p>
+                <p className="text-lg font-semibold">
+                  {formatPrice(product.price, product.currency)}
+                </p>
               </CardContent>
               <CardFooter className="flex gap-3">
                 <Button asChild className="flex-1">
@@ -158,7 +169,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
 
 function parseSearch(search?: string | string[]) {
   if (!search) return ''
-  return Array.isArray(search) ? search[0] ?? '' : search
+  return Array.isArray(search) ? (search[0] ?? '') : search
 }
 
 function buildSearchClause(search: string) {
@@ -186,7 +197,7 @@ function buildSearchClause(search: string) {
 }
 
 function resolveProductImage(product: Product) {
-  const featured = product.featuredImage
+  const featured = product.image
   if (featured && typeof featured === 'object' && 'url' in featured) {
     return (featured as ProductImage).url
   }
@@ -210,4 +221,3 @@ function formatPrice(value?: number, currency = 'USD') {
     return `$${amount.toFixed(2)}`
   }
 }
-

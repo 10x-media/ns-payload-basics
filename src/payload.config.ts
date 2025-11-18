@@ -11,12 +11,13 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Products } from './collections/Products'
 import { ProductImages } from './collections/ProductImages'
-import { Orders } from './collections/Orders'
+import { Orders } from './collections/orders/Orders'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { SiteSettings } from './globals/SiteSettings'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { payloadAiPlugin } from '@ai-stack/payloadcms'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
+import { Vendors } from './collections/Vendors'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -33,7 +34,7 @@ export default buildConfig({
     defaultFromName: 'Sandro Wegmann',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Media, Pages, Products, ProductImages, Orders, Users],
+  collections: [Media, Pages, Products, ProductImages, Orders, Users, Vendors],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -66,12 +67,12 @@ export default buildConfig({
         // ... Other S3 configuration
       },
     }),
-    payloadAiPlugin({
-      collections: {
-        [Products.slug]: true,
-      },
-      debugging: false,
-    }),
+    // payloadAiPlugin({
+    //   collections: {
+    //     [Products.slug]: true,
+    //   },
+    //   debugging: false,
+    // }),
     mcpPlugin({
       collections: {
         products: {

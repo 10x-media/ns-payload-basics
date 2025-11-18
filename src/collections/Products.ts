@@ -27,6 +27,9 @@ export const Products: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'status',
@@ -37,6 +40,9 @@ export const Products: CollectionConfig = {
         { label: 'Active', value: 'active' },
         { label: 'Archived', value: 'archived' },
       ],
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       type: 'row',
@@ -48,65 +54,23 @@ export const Products: CollectionConfig = {
           required: true,
         },
         {
-          name: 'currency',
-          type: 'text',
-          defaultValue: 'USD',
+          name: 'inventory',
+          type: 'number',
+          defaultValue: 0,
+          min: 0,
         },
       ],
     },
     {
-      name: 'inventory',
-      type: 'number',
-      defaultValue: 0,
-      min: 0,
-    },
-    {
-      name: 'shortDescription',
+      name: 'description',
       type: 'textarea',
       label: 'Short Description',
     },
     {
-      name: 'longDescription',
-      type: 'richText',
-      label: 'Long Description',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [
-            // ... your existing features
-            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-
-            // Please add below
-            PayloadAiPluginLexicalEditorFeature(),
-          ]
-        },
-      }),
-    },
-    {
-      name: 'tags',
-      type: 'array',
-      labels: {
-        singular: 'Tag',
-        plural: 'Tags',
-      },
-      fields: [
-        {
-          name: 'value',
-          type: 'text',
-        },
-      ],
-    },
-    {
-      name: 'featuredImage',
-      type: 'relationship',
+      name: 'image',
+      type: 'upload',
       relationTo: 'product-images',
       label: 'Featured Image',
-    },
-    {
-      name: 'images',
-      type: 'relationship',
-      relationTo: 'product-images',
-      hasMany: true,
-      label: 'Gallery Images',
     },
     {
       name: 'metadata',

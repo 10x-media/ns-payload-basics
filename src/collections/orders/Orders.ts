@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
-
-const generateOrderNumber = () => `ORD-${Date.now().toString(36).toUpperCase()}`
+import { generateOrderNumberHook } from './hooks/generateOrderNumberHook'
+import { reduceInventoryHook } from './hooks/reduceInventoryHook'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -14,20 +14,11 @@ export const Orders: CollectionConfig = {
     defaultColumns: ['orderNumber', 'status', 'total', 'customer'],
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
     create: () => true,
   },
   hooks: {
-    beforeValidate: [
-      ({ data }) => {
-        if (!data?.orderNumber) {
-          data.orderNumber = generateOrderNumber()
-        }
-        return data
-      },
-    ],
+    beforeValidate: [generateOrderNumberHook],
+    afterChange: [reduceInventoryHook],
   },
   fields: [
     {
@@ -35,6 +26,10 @@ export const Orders: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
     },
     {
       name: 'status',
@@ -46,6 +41,9 @@ export const Orders: CollectionConfig = {
         { label: 'Shipped', value: 'shipped' },
         { label: 'Cancelled', value: 'cancelled' },
       ],
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'paymentStatus',
@@ -56,6 +54,9 @@ export const Orders: CollectionConfig = {
         { label: 'Paid', value: 'paid' },
         { label: 'Refunded', value: 'refunded' },
       ],
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'customer',
@@ -83,10 +84,20 @@ export const Orders: CollectionConfig = {
       fields: [
         { name: 'line1', type: 'text', required: true },
         { name: 'line2', type: 'text' },
-        { name: 'city', type: 'text', required: true },
-        { name: 'region', type: 'text', label: 'State / Region' },
-        { name: 'postalCode', type: 'text', required: true },
-        { name: 'country', type: 'text', required: true },
+        {
+          type: 'row',
+          fields: [
+            { name: 'postalCode', type: 'text', required: true },
+            { name: 'city', type: 'text', required: true },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'region', type: 'text', label: 'State / Region' },
+            { name: 'country', type: 'text', required: true },
+          ],
+        },
       ],
     },
     {
@@ -111,27 +122,37 @@ export const Orders: CollectionConfig = {
           label: 'Product Snapshot',
           fields: [
             { name: 'name', type: 'text' },
-            { name: 'price', type: 'number' },
-            { name: 'currency', type: 'text' },
+            {
+              type: 'row',
+              fields: [
+                { name: 'price', type: 'number' },
+                { name: 'currency', type: 'text' },
+              ],
+            },
           ],
         },
         {
-          name: 'quantity',
-          type: 'number',
-          required: true,
-          min: 1,
-          defaultValue: 1,
-        },
-        {
-          name: 'unitPrice',
-          type: 'number',
-          required: true,
-          min: 0,
-        },
-        {
-          name: 'subtotal',
-          type: 'number',
-          min: 0,
+          type: 'row',
+          fields: [
+            {
+              name: 'quantity',
+              type: 'number',
+              required: true,
+              min: 1,
+              defaultValue: 1,
+            },
+            {
+              name: 'unitPrice',
+              type: 'number',
+              required: true,
+              min: 0,
+            },
+            {
+              name: 'subtotal',
+              type: 'number',
+              min: 0,
+            },
+          ],
         },
       ],
     },
@@ -151,10 +172,6 @@ export const Orders: CollectionConfig = {
           required: true,
         },
       ],
-    },
-    {
-      name: 'notes',
-      type: 'textarea',
     },
   ],
 }

@@ -64,6 +64,8 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    vendors: VendorAuthOperations;
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
@@ -73,7 +75,8 @@ export interface Config {
     'product-images': ProductImage;
     orders: Order;
     users: User;
-    'plugin-ai-instructions': PluginAiInstruction;
+    vendors: Vendor;
+    'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -87,7 +90,8 @@ export interface Config {
     'product-images': ProductImagesSelect<false> | ProductImagesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    'plugin-ai-instructions': PluginAiInstructionsSelect<false> | PluginAiInstructionsSelect<true>;
+    vendors: VendorsSelect<false> | VendorsSelect<true>;
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -103,15 +107,58 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
-  };
+  user:
+    | (User & {
+        collection: 'users';
+      })
+    | (Vendor & {
+        collection: 'vendors';
+      })
+    | (PayloadMcpApiKey & {
+        collection: 'payload-mcp-api-keys';
+      });
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface VendorAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -219,32 +266,9 @@ export interface Product {
   slug: string;
   status?: ('draft' | 'active' | 'archived') | null;
   price: number;
-  currency?: string | null;
   inventory?: number | null;
-  shortDescription?: string | null;
-  longDescription?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  tags?:
-    | {
-        value?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  featuredImage?: (string | null) | ProductImage;
-  images?: (string | ProductImage)[] | null;
+  description?: string | null;
+  image?: (string | null) | ProductImage;
   metadata?: {
     sku?: string | null;
     vendor?: string | null;
@@ -259,8 +283,6 @@ export interface Product {
 export interface ProductImage {
   id: string;
   alt: string;
-  product?: (string | null) | Product;
-  position?: number | null;
   prefix?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -291,9 +313,9 @@ export interface Order {
   shippingAddress: {
     line1: string;
     line2?: string | null;
+    postalCode: string;
     city: string;
     region?: string | null;
-    postalCode: string;
     country: string;
   };
   lineItems: {
@@ -310,7 +332,6 @@ export interface Order {
   }[];
   subtotal: number;
   total: number;
-  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -340,78 +361,73 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "plugin-ai-instructions".
+ * via the `definition` "vendors".
  */
-export interface PluginAiInstruction {
+export interface Vendor {
   id: string;
-  /**
-   * Please don't change this unless you're sure of what you're doing
-   */
-  'schema-path'?: string | null;
-  /**
-   * Please don't change this unless you're sure of what you're doing
-   */
-  'field-type'?: ('text' | 'textarea' | 'upload' | 'richText') | null;
-  'relation-to'?: string | null;
-  'model-id'?: ('Oai-text' | 'dall-e' | 'gpt-image-1' | 'tts' | 'Oai-object') | null;
-  /**
-   * Please reload your collection after applying the changes
-   */
-  disabled?: boolean | null;
-  /**
-   * Click 'Compose' to run this custom prompt and generate content
-   */
-  prompt?: string | null;
-  images?:
+  name: string;
+  taxId: string;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
     | {
-        /**
-         * Please make sure the image is publicly accessible.
-         */
-        image?: (string | null) | Media;
-        id?: string | null;
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
       }[]
     | null;
-  system?: string | null;
-  layout?: string | null;
-  'Oai-text-settings'?: {
-    model?:
-      | ('gpt-5' | 'gpt-5-mini' | 'gpt-5-nano' | 'gpt-4.1' | 'gpt-4o' | 'gpt-4-turbo' | 'gpt-4o-mini' | 'gpt-3.5-turbo')
-      | null;
-    maxTokens?: number | null;
-    temperature?: number | null;
-    extractAttachments?: boolean | null;
-  };
-  'dalle-e-settings'?: {
-    version?: ('dall-e-3' | 'dall-e-2') | null;
-    size?: ('256x256' | '512x512' | '1024x1024' | '1792x1024' | '1024x1792') | null;
-    style?: ('vivid' | 'natural') | null;
-    'enable-prompt-optimization'?: boolean | null;
-  };
-  'gpt-image-1-settings'?: {
-    version?: 'gpt-image-1' | null;
-    size?: ('1024x1024' | '1024x1536' | '1536x1024' | 'auto') | null;
-    quality?: ('low' | 'medium' | 'high' | 'auto') | null;
-    output_format?: ('png' | 'jpeg' | 'webp') | null;
-    output_compression?: number | null;
-    background?: ('white' | 'transparent') | null;
-    moderation?: ('auto' | 'low') | null;
-  };
-  'Oai-tts-settings'?: {
-    voice?: ('alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer') | null;
-    model?: ('tts-1' | 'tts-1-hd') | null;
-    response_format?: ('mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm') | null;
-    speed?: number | null;
-  };
-  'Oai-object-settings'?: {
-    model?:
-      | ('gpt-5' | 'gpt-5-mini' | 'gpt-5-nano' | 'gpt-4.1' | 'gpt-4o' | 'gpt-4-turbo' | 'gpt-4o-mini' | 'gpt-3.5-turbo')
-      | null;
-    maxTokens?: number | null;
-    temperature?: number | null;
-    extractAttachments?: boolean | null;
+  password?: string | null;
+}
+/**
+ * API keys control which collections, resources, tools, and prompts MCP clients can access
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: string;
+  /**
+   * The user that the API key is associated with.
+   */
+  user: string | User;
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null;
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null;
+  products?: {
+    /**
+     * Allow clients to find products.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create products.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update products.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete products.
+     */
+    delete?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -462,14 +478,27 @@ export interface PayloadLockedDocument {
         value: string | User;
       } | null)
     | ({
-        relationTo: 'plugin-ai-instructions';
-        value: string | PluginAiInstruction;
+        relationTo: 'vendors';
+        value: string | Vendor;
+      } | null)
+    | ({
+        relationTo: 'payload-mcp-api-keys';
+        value: string | PayloadMcpApiKey;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'vendors';
+        value: string | Vendor;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: string | PayloadMcpApiKey;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -479,10 +508,19 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: string;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'vendors';
+        value: string | Vendor;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: string | PayloadMcpApiKey;
+      };
   key?: string | null;
   value?:
     | {
@@ -603,18 +641,9 @@ export interface ProductsSelect<T extends boolean = true> {
   slug?: T;
   status?: T;
   price?: T;
-  currency?: T;
   inventory?: T;
-  shortDescription?: T;
-  longDescription?: T;
-  tags?:
-    | T
-    | {
-        value?: T;
-        id?: T;
-      };
-  featuredImage?: T;
-  images?: T;
+  description?: T;
+  image?: T;
   metadata?:
     | T
     | {
@@ -630,8 +659,6 @@ export interface ProductsSelect<T extends boolean = true> {
  */
 export interface ProductImagesSelect<T extends boolean = true> {
   alt?: T;
-  product?: T;
-  position?: T;
   prefix?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -665,9 +692,9 @@ export interface OrdersSelect<T extends boolean = true> {
     | {
         line1?: T;
         line2?: T;
+        postalCode?: T;
         city?: T;
         region?: T;
-        postalCode?: T;
         country?: T;
       };
   lineItems?:
@@ -688,7 +715,6 @@ export interface OrdersSelect<T extends boolean = true> {
       };
   subtotal?: T;
   total?: T;
-  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -716,68 +742,49 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "plugin-ai-instructions_select".
+ * via the `definition` "vendors_select".
  */
-export interface PluginAiInstructionsSelect<T extends boolean = true> {
-  'schema-path'?: T;
-  'field-type'?: T;
-  'relation-to'?: T;
-  'model-id'?: T;
-  disabled?: T;
-  prompt?: T;
-  images?:
+export interface VendorsSelect<T extends boolean = true> {
+  name?: T;
+  taxId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
     | T
     | {
-        image?: T;
         id?: T;
+        createdAt?: T;
+        expiresAt?: T;
       };
-  system?: T;
-  layout?: T;
-  'Oai-text-settings'?:
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  description?: T;
+  products?:
     | T
     | {
-        model?: T;
-        maxTokens?: T;
-        temperature?: T;
-        extractAttachments?: T;
-      };
-  'dalle-e-settings'?:
-    | T
-    | {
-        version?: T;
-        size?: T;
-        style?: T;
-        'enable-prompt-optimization'?: T;
-      };
-  'gpt-image-1-settings'?:
-    | T
-    | {
-        version?: T;
-        size?: T;
-        quality?: T;
-        output_format?: T;
-        output_compression?: T;
-        background?: T;
-        moderation?: T;
-      };
-  'Oai-tts-settings'?:
-    | T
-    | {
-        voice?: T;
-        model?: T;
-        response_format?: T;
-        speed?: T;
-      };
-  'Oai-object-settings'?:
-    | T
-    | {
-        model?: T;
-        maxTokens?: T;
-        temperature?: T;
-        extractAttachments?: T;
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
       };
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
