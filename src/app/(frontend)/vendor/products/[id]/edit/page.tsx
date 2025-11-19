@@ -37,9 +37,9 @@ export default function EditProductPage() {
           router.push('/vendor/login')
           return
         }
-        setVendor(vendorData)
+        setVendor(vendorData.user)
 
-        const response = await fetch(`/api/products/${productId}`, {
+        const response = await fetch(`/api/products/${productId}?depth=1`, {
           credentials: 'include',
         })
 
@@ -48,9 +48,12 @@ export default function EditProductPage() {
         }
 
         const productData = await response.json()
-        
+
         // Verify the product belongs to this vendor
-        if (typeof productData.vendor === 'object' && productData.vendor.id !== vendorData.id) {
+        const vendorId =
+          typeof productData.vendor === 'object' ? productData.vendor?.id : productData.vendor
+
+        if (!vendorId || vendorId !== vendorData.user.id) {
           router.push('/vendor/dashboard')
           return
         }
@@ -96,7 +99,9 @@ export default function EditProductPage() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to update product' }))
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: 'Failed to update product' }))
         throw new Error(errorData.message || 'Failed to update product')
       }
 
@@ -153,7 +158,7 @@ export default function EditProductPage() {
                 placeholder="product-slug"
               />
               <p className="text-xs text-muted-foreground">
-                URL-friendly identifier (e.g., "my-awesome-product")
+                URL-friendly identifier (e.g., &quot;my-awesome-product&quot;)
               </p>
             </div>
 
@@ -236,4 +241,3 @@ export default function EditProductPage() {
     </div>
   )
 }
-

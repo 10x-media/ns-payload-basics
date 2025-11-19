@@ -16,12 +16,9 @@ import { Orders } from './collections/orders/Orders'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { SiteSettings } from './globals/SiteSettings'
 import { s3Storage } from '@payloadcms/storage-s3'
-import { payloadAiPlugin } from '@ai-stack/payloadcms'
-import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Vendors } from './collections/Vendors'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
 import { InvoiceDocuments } from './collections/orders/InvoiceDocuments'
-import { Dashboard } from './components/admin/Dashboard'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -67,9 +64,9 @@ export default buildConfig({
         'product-images': {
           prefix: 'product-images',
         },
-        // 'invoice-documents': {
-        //   prefix: 'invoice-documents',
-        // },
+        'invoice-documents': {
+          prefix: 'invoice-documents',
+        },
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
@@ -88,13 +85,6 @@ export default buildConfig({
     //   },
     //   debugging: false,
     // }),
-    mcpPlugin({
-      collections: {
-        products: {
-          enabled: true,
-        },
-      },
-    }),
 
     stripePlugin({
       stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',

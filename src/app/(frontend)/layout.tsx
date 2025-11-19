@@ -3,8 +3,7 @@ import type { ReactNode } from 'react'
 
 import { Header } from '../../components/Header'
 import { Footer } from '../../components/Footer'
-import type { SiteSetting } from '@/payload-types'
-import config from '@/payload.config'
+import config from '@payload-config'
 import '@/styles/globals.css'
 
 export const metadata = {
@@ -15,8 +14,7 @@ export const metadata = {
 export default async function RootLayout(props: { children: ReactNode }) {
   const { children } = props
 
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
+  const payload = await getPayload({ config })
 
   const siteSettings = await payload.findGlobal({
     slug: 'site-settings',
