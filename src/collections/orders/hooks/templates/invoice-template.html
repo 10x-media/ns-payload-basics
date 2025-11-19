@@ -5,151 +5,34 @@
     <meta charset="UTF-8" />
     <title>Invoice <%= order.orderNumber %>
     </title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 40px;
-            background: #f5f5f5;
-            color: #222;
-        }
-
-        .invoice-wrapper {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 32px;
-            border-radius: 8px;
-            border: 1px solid #e5e5e5;
-        }
-
-        h1,
-        h2,
-        h3 {
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 32px;
-        }
-
-        .company-info {
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .invoice-meta {
-            text-align: right;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .section {
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 8px;
-            color: #666;
-        }
-
-        .two-columns {
-            display: flex;
-            gap: 32px;
-            font-size: 14px;
-        }
-
-        .column {
-            flex: 1;
-        }
-
-        .box {
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            padding: 12px 14px;
-            background: #fafafa;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            font-size: 14px;
-        }
-
-        th,
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-
-        th {
-            background: #fafafa;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #555;
-        }
-
-        tfoot td {
-            border-bottom: none;
-            font-size: 14px;
-        }
-
-        tfoot tr:last-child td {
-            font-weight: 600;
-            border-top: 1px solid #ddd;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .muted {
-            color: #777;
-            font-size: 12px;
-        }
-    </style>
 </head>
 
-<body>
-    <div class="invoice-wrapper">
+<body class="font-sans m-0 p-10 bg-gray-100 text-gray-900">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg border border-gray-200">
         <!-- Header -->
-        <header class="header">
-            <div class="company-info">
-                <h1>Invoice</h1>
-                <div class="muted">Mercato Inc.</div>
-                <div class="muted">123 Main St. · 12345 City</div>
-                <div class="muted">info@mercato.com</div>
+        <header class="flex justify-between items-start mb-8">
+            <div class="text-sm leading-snug">
+                <h1 class="m-0 font-semibold">Invoice</h1>
+                <div class="text-gray-500 text-xs">Mercato Inc.</div>
+                <div class="text-gray-500 text-xs">123 Main St. · 12345 City</div>
+                <div class="text-gray-500 text-xs">info@mercato.com</div>
             </div>
-            <div class="invoice-meta">
+            <div class="text-right text-sm leading-snug">
                 <div><strong>Invoice No:</strong>
                     <%= order.orderNumber %>
                 </div>
-                <div>
-                    <strong>Date:</strong>
-                    <!-- format server-side if you want, or pass a preformatted date -->
+                <div><strong>Date:</strong>
                     <%= order.createdAtFormatted || order.createdAt %>
                 </div>
             </div>
         </header>
 
         <!-- Customer & Shipping -->
-        <section class="section">
-            <div class="two-columns">
-                <div class="column">
-                    <div class="section-title">Billed To</div>
-                    <div class="box">
+        <section class="mb-6">
+            <div class="flex gap-8 text-sm">
+                <div class="flex-1">
+                    <div class="text-sm font-semibold uppercase tracking-wider mb-2 text-gray-600">Billed To</div>
+                    <div class="border border-gray-200 rounded-md p-3 bg-gray-50">
                         <div><strong>
                                 <%= order.customer.name %>
                             </strong></div>
@@ -158,10 +41,10 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="column">
-                    <div class="section-title">Shipping Address</div>
-                    <div class="box">
+                <div class="flex-1">
+                    <div class="text-sm font-semibold uppercase tracking-wider mb-2 text-gray-600">Shipping Address
+                    </div>
+                    <div class="border border-gray-200 rounded-md p-3 bg-gray-50">
                         <div>
                             <%= order.shippingAddress.line1 %>
                         </div>
@@ -178,50 +61,60 @@
         </section>
 
         <!-- Line Items -->
-        <section class="section">
-            <div class="section-title">Order Items</div>
-            <table>
+        <section class="mb-6">
+            <div class="text-sm font-semibold uppercase tracking-wider mb-2 text-gray-600">Order Items</div>
+            <table class="w-full border-collapse mt-2 text-sm">
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>SKU / Vendor</th>
-                        <th class="text-right">Qty</th>
-                        <th class="text-right">Unit Price</th>
-                        <th class="text-right">Subtotal</th>
+                        <th
+                            class="p-2.5 border-b border-gray-200 text-left bg-gray-50 font-semibold text-xs uppercase tracking-wide text-gray-600">
+                            Item</th>
+                        <th
+                            class="p-2.5 border-b border-gray-200 text-left bg-gray-50 font-semibold text-xs uppercase tracking-wide text-gray-600">
+                            SKU / Vendor</th>
+                        <th
+                            class="p-2.5 border-b border-gray-200 text-right bg-gray-50 font-semibold text-xs uppercase tracking-wide text-gray-600">
+                            Qty</th>
+                        <th
+                            class="p-2.5 border-b border-gray-200 text-right bg-gray-50 font-semibold text-xs uppercase tracking-wide text-gray-600">
+                            Unit Price</th>
+                        <th
+                            class="p-2.5 border-b border-gray-200 text-right bg-gray-50 font-semibold text-xs uppercase tracking-wide text-gray-600">
+                            Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% order.lineItems.forEach(function (item) { %>
                         <tr>
-                            <td>
+                            <td class="p-2.5 border-b border-gray-200 text-left">
                                 <strong>
                                     <%= item.productSnapshot?.name || item.product?.name %>
                                 </strong>
                                 <% if (item.product?.description) { %>
-                                    <div class="muted">
+                                    <div class="text-gray-500 text-xs">
                                         <%= item.product.description %>
                                     </div>
                                     <% } %>
                             </td>
-                            <td>
+                            <td class="p-2.5 border-b border-gray-200 text-left">
                                 <% if (item.product?.metadata?.sku) { %>
                                     <div>SKU: <%= item.product.metadata.sku %>
                                     </div>
                                     <% } %>
                                         <% if (item.product?.metadata?.vendor) { %>
-                                            <div class="muted">
+                                            <div class="text-gray-500 text-xs">
                                                 <%= item.product.metadata.vendor %>
                                             </div>
                                             <% } %>
                             </td>
-                            <td class="text-right">
+                            <td class="p-2.5 border-b border-gray-200 text-right">
                                 <%= item.quantity %>
                             </td>
-                            <td class="text-right">
+                            <td class="p-2.5 border-b border-gray-200 text-right">
                                 <%= item.productSnapshot?.currency || "USD" %>
                                     <%= item.unitPrice.toFixed ? item.unitPrice.toFixed(2) : item.unitPrice %>
                             </td>
-                            <td class="text-right">
+                            <td class="p-2.5 border-b border-gray-200 text-right">
                                 <%= item.productSnapshot?.currency || "USD" %>
                                     <%= item.subtotal.toFixed ? item.subtotal.toFixed(2) : item.subtotal %>
                             </td>
@@ -233,8 +126,8 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td colspan="4" class="text-right">Subtotal</td>
-                        <td class="text-right">
+                        <td class="p-2.5 border-b-0 text-sm text-right">Subtotal</td>
+                        <td class="p-2.5 border-b-0 text-sm text-right">
                             <%= order.lineItems[0]?.productSnapshot?.currency || "USD" %>
                                 <%= order.subtotal.toFixed ? order.subtotal.toFixed(2) : order.subtotal %>
                         </td>
@@ -243,8 +136,9 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td colspan="4" class="text-right">Total</td>
-                        <td class="text-right">
+                        <td class="p-2.5 border-b-0 text-sm text-right font-semibold border-t border-gray-300">Total
+                        </td>
+                        <td class="p-2.5 border-b-0 text-sm text-right font-semibold border-t border-gray-300">
                             <%= order.lineItems[0]?.productSnapshot?.currency || "USD" %>
                                 <%= order.total.toFixed ? order.total.toFixed(2) : order.total %>
                         </td>
@@ -254,10 +148,9 @@
         </section>
 
         <!-- Footer -->
-        <section class="section">
-            <p class="muted">
-                Thank you for your order.
-                Please include the invoice number in your payment reference.
+        <section class="mb-6">
+            <p class="text-gray-500 text-xs">
+                Thank you for your order. Please include the invoice number in your payment reference.
             </p>
         </section>
     </div>

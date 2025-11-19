@@ -21,6 +21,7 @@ import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Vendors } from './collections/Vendors'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
 import { InvoiceDocuments } from './collections/orders/InvoiceDocuments'
+import { Dashboard } from './components/admin/Dashboard'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -31,6 +32,13 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      views: {
+        dashboard: {
+          Component: '@/components/admin/Dashboard#Dashboard',
+        },
+      },
     },
   },
   email: resendAdapter({
