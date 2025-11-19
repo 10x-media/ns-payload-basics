@@ -13,6 +13,7 @@ export const Vendors: CollectionConfig = {
   auth: true,
   access: {
     read: () => true,
+    create: () => true,
   },
   fields: [
     {

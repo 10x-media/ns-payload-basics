@@ -284,9 +284,9 @@ export interface Product {
   inventory?: number | null;
   description?: string | null;
   image?: (string | null) | ProductImage;
+  vendor: string | Vendor;
   metadata?: {
     sku?: string | null;
-    vendor?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -310,6 +310,32 @@ export interface ProductImage {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendors".
+ */
+export interface Vendor {
+  id: string;
+  name: string;
+  taxId: string;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -375,32 +401,6 @@ export interface InvoiceDocument {
  */
 export interface User {
   id: string;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendors".
- */
-export interface Vendor {
-  id: string;
-  name: string;
-  taxId: string;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -776,11 +776,11 @@ export interface ProductsSelect<T extends boolean = true> {
   inventory?: T;
   description?: T;
   image?: T;
+  vendor?: T;
   metadata?:
     | T
     | {
         sku?: T;
-        vendor?: T;
       };
   updatedAt?: T;
   createdAt?: T;
