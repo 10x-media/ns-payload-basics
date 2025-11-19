@@ -20,7 +20,7 @@ export const Orders: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [generateOrderNumberHook],
-    beforeChange: [generateInvoiceDocumentHook],
+    // beforeChange: [generateInvoiceDocumentHook],
     afterChange: [reduceInventoryHook, sendOrderConfirmationEmailHook],
   },
   fields: [
