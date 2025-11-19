@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import type { SiteSetting } from '@/payload-types'
 import Link from 'next/link'
+import { VendorAuthButtons } from './VendorAuthButtons'
 
 export type HeaderContent = Pick<SiteSetting, 'logoText' | 'navLinks' | 'cta'>
 
@@ -28,6 +29,7 @@ export function Header({ header, userEmail }: HeaderProps) {
           ))}
         </nav>
         <div className="flex items-center gap-3">
+          <VendorAuthButtons />
           {header.cta?.href && header.cta?.label && (
             <Button asChild>
               <a href={header.cta.href}>{header.cta.label}</a>
