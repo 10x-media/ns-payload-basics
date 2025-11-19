@@ -1,7 +1,6 @@
-import { PayloadAiPluginLexicalEditorFeature } from '@ai-stack/payloadcms'
-import { HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig, User } from 'payload'
 import { autoAssignVendorHook } from './hooks/autoAssignVendorHook'
+import { validateProductWithAIHook } from './hooks/validateProductWithAIHook'
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -12,7 +11,7 @@ export const Products: CollectionConfig = {
   admin: {
     group: 'Shop',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'price', 'inventory', 'status'],
+    defaultColumns: ['name', 'price', 'inventory', 'status', 'validationStatus'],
   },
   access: {
     read: () => true,
@@ -47,6 +46,7 @@ export const Products: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [autoAssignVendorHook],
+    beforeChange: [validateProductWithAIHook],
   },
   fields: [
     {
@@ -74,6 +74,34 @@ export const Products: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'manuallyVerified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Check this to manually set validation status and disable AI validation.',
+      },
+    },
+    {
+      name: 'validationStatus',
+      type: 'select',
+      required: true,
+      defaultValue: 'needs human validation',
+      options: [
+        { label: 'Blocked', value: 'blocked' },
+        { label: 'Checked', value: 'checked' },
+        { label: 'Needs Human Validation', value: 'needs human validation' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'AI validation status. Only "checked" products are shown on the marketplace. Enable "Manually Verified" to set this manually without AI override.',
+        components: {
+          Cell: '/collections/products/cells/ValidationStatusCell#ValidationStatusCell',
+        },
       },
     },
     {

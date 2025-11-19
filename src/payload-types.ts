@@ -280,6 +280,14 @@ export interface Product {
   name: string;
   slug: string;
   status?: ('draft' | 'active' | 'archived') | null;
+  /**
+   * Check this to manually set validation status and disable AI validation.
+   */
+  manuallyVerified?: boolean | null;
+  /**
+   * AI validation status. Only "checked" products are shown on the marketplace. Enable "Manually Verified" to set this manually without AI override.
+   */
+  validationStatus: 'blocked' | 'checked' | 'needs human validation';
   price: number;
   inventory?: number | null;
   description?: string | null;
@@ -772,6 +780,8 @@ export interface ProductsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   status?: T;
+  manuallyVerified?: T;
+  validationStatus?: T;
   price?: T;
   inventory?: T;
   description?: T;

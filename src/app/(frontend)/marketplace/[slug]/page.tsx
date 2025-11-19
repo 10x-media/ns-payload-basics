@@ -20,9 +20,18 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
       depth: 2,
       limit: 1,
       where: {
-        slug: {
-          equals: slug,
-        },
+        and: [
+          {
+            slug: {
+              equals: slug,
+            },
+          },
+          {
+            validationStatus: {
+              equals: 'checked',
+            },
+          },
+        ],
       },
     })
     .catch(() => null)
