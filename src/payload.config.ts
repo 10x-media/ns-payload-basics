@@ -5,6 +5,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import type Stripe from 'stripe'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -20,12 +21,12 @@ import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Vendors } from './collections/Vendors'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
 import { InvoiceDocuments } from './collections/orders/InvoiceDocuments'
-import { handleCheckoutSessionCompleted } from './collections/orders/hooks/handleStripeWebhook'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  serverURL: process.env.NEXT_PUBLIC_URL || '',
   admin: {
     user: Users.slug,
     importMap: {
@@ -58,9 +59,9 @@ export default buildConfig({
         'product-images': {
           prefix: 'product-images',
         },
-        'invoice-documents': {
-          prefix: 'invoice-documents',
-        },
+        // 'invoice-documents': {
+        //   prefix: 'invoice-documents',
+        // },
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
@@ -91,8 +92,26 @@ export default buildConfig({
       stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
       stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET,
       webhooks: {
-        'checkout.session.completed': async ({ event, stripe, payload }) => {
-          await handleCheckoutSessionCompleted({ event, stripe, payload })
+        'checkout.session.completed': async ({ event, payload }) => {
+          const session = event.data.object as Stripe.Checkout.Session
+          const orderId = session.metadata?.orderId
+
+          if (!orderId) {
+            console.error('Missing orderId in checkout session metadata')
+            return
+          }
+
+          // Update order payment status to paid
+          await payload.update({
+            collection: 'orders',
+            id: orderId,
+            data: {
+              paymentStatus: 'paid',
+              status: 'paid',
+            },
+          })
+
+          console.log(`Order ${orderId} marked as paid`)
         },
       },
     }),

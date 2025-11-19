@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid product price.' }, { status: 400 })
     }
 
-    const stripe = new Stripe(stripeSecret, { apiVersion: '2022-08-01' })
+    const stripe = new Stripe(stripeSecret, { apiVersion: '2025-10-29.clover' })
 
     const origin = request.headers.get('origin') || 'http://localhost:3000'
 

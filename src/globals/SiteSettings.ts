@@ -23,11 +23,6 @@ export const SiteSettings: GlobalConfig = {
               required: true,
             },
             {
-              name: 'tagline',
-              type: 'text',
-              label: 'Tagline',
-            },
-            {
               name: 'navLinks',
               type: 'array',
               label: 'Navigation Links',
@@ -81,25 +76,6 @@ export const SiteSettings: GlobalConfig = {
               name: 'description',
               type: 'textarea',
               label: 'Description',
-            },
-            {
-              name: 'links',
-              type: 'array',
-              label: 'Links',
-              fields: [
-                {
-                  name: 'label',
-                  type: 'text',
-                  label: 'Label',
-                  required: true,
-                },
-                {
-                  name: 'href',
-                  type: 'text',
-                  label: 'URL',
-                  required: true,
-                },
-              ],
             },
             {
               name: 'legal',

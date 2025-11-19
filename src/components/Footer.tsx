@@ -16,19 +16,6 @@ export function Footer({ footer }: FooterProps) {
         <div className="space-y-2 max-w-xl">
           {footer.headline && <h3 className="text-2xl font-semibold">{footer.headline}</h3>}
           {footer.description && <p className="text-muted-foreground">{footer.description}</p>}
-          {footer.links && footer.links.length > 0 && (
-            <div className="flex flex-wrap gap-4 text-sm">
-              {footer.links.map((link) => (
-                <a
-                  key={link.href}
-                  className="text-muted-foreground transition hover:text-foreground"
-                  href={link.href}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          )}
         </div>
         <div className="w-full md:w-auto">
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -42,12 +29,9 @@ export function Footer({ footer }: FooterProps) {
                 )}
               </React.Fragment>
             ))}
-            <span className="text-muted-foreground">@Payload ready</span>
           </div>
         </div>
       </div>
     </footer>
   )
 }
-
-

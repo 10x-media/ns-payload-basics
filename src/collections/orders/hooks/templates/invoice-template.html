@@ -128,19 +128,13 @@
         <header class="header">
             <div class="company-info">
                 <h1>Invoice</h1>
-                <div class="muted">Your Company Name</div>
-                <div class="muted">Street 123 · 12345 City</div>
-                <div class="muted">info@yourcompany.com</div>
+                <div class="muted">Mercato Inc.</div>
+                <div class="muted">123 Main St. · 12345 City</div>
+                <div class="muted">info@mercato.com</div>
             </div>
             <div class="invoice-meta">
                 <div><strong>Invoice No:</strong>
                     <%= order.orderNumber %>
-                </div>
-                <div><strong>Status:</strong>
-                    <%= order.status %>
-                </div>
-                <div><strong>Payment:</strong>
-                    <%= order.paymentStatus %>
                 </div>
                 <div>
                     <strong>Date:</strong>
@@ -236,6 +230,9 @@
                 </tbody>
                 <tfoot>
                     <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td colspan="4" class="text-right">Subtotal</td>
                         <td class="text-right">
                             <%= order.lineItems[0]?.productSnapshot?.currency || "USD" %>
@@ -243,6 +240,9 @@
                         </td>
                     </tr>
                     <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td colspan="4" class="text-right">Total</td>
                         <td class="text-right">
                             <%= order.lineItems[0]?.productSnapshot?.currency || "USD" %>

@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { slugField, type CollectionConfig } from 'payload'
 import { revalidatePath } from 'next/cache'
 
 import { HeroSection } from '@/blocks/HeroSection'
@@ -15,6 +15,24 @@ export const Pages: CollectionConfig = {
     group: 'CMS',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
+    livePreview: {
+      url: async ({ data, req }) => {
+        if (!data?.site || !data?.slug) return ''
+
+        const pathname = data.slug === 'index' ? '/' : `/${data.slug}`
+
+        return generatePreviewPath({ pathname })
+      },
+    },
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 300,
+      },
+      schedulePublish: true,
+    },
+    maxPerDoc: 50,
   },
   access: {
     read: () => true,
@@ -41,12 +59,7 @@ export const Pages: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-    },
+    slugField({}),
     {
       name: 'layout',
       type: 'blocks',

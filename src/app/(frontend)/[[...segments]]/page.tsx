@@ -12,6 +12,7 @@ type Props = {
 export default async function DynamicPage({ params }: Props) {
   const { segments } = await params
   const slug = segments?.join('/') || 'home'
+  console.log(slug)
 
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })

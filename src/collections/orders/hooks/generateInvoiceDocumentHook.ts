@@ -23,7 +23,16 @@ export async function generateInvoiceDocumentHook({ data, req }: { data: Order; 
   const payload = req.payload
 
   const html = ejs.render(invoiceTemplate, {
-    order: data,
+    order: {
+      ...data,
+      createdAtFormatted: data.createdAt
+        ? new Date(data.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        : '',
+    },
   })
 
   let printData = {
@@ -70,10 +79,13 @@ export async function generateInvoiceDocumentHook({ data, req }: { data: Order; 
     file: {
       data: pdfBuffer, // Buffer containing file bytes
       // name: `invoice-${data.orderNumber}.pdf`, // e.g. 'invoice.pdf'
-      name: `invoice.pdf`, // e.g. 'invoice.pdf'
+      name: 'invoice.pdf',
       type: 'application/pdf', // e.g. 'application/pdf'
       size: pdfBuffer.length,
     },
   })
+
+  data.invoice = invoice.id
+
   return data
 }

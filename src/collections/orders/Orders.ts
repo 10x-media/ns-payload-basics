@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { generateOrderNumberHook } from './hooks/generateOrderNumberHook'
 import { reduceInventoryHook } from './hooks/reduceInventoryHook'
 import { generateInvoiceDocumentHook } from './hooks/generateInvoiceDocumentHook'
+import { sendOrderConfirmationEmailHook } from './hooks/sendOrderConfirmationEmailHook'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -20,12 +21,12 @@ export const Orders: CollectionConfig = {
   hooks: {
     beforeValidate: [generateOrderNumberHook],
     beforeChange: [generateInvoiceDocumentHook],
-    afterChange: [reduceInventoryHook],
+    afterChange: [reduceInventoryHook, sendOrderConfirmationEmailHook],
   },
   fields: [
     {
       name: 'invoice',
-      type: 'relationship',
+      type: 'upload',
       relationTo: 'invoice-documents',
     },
     {

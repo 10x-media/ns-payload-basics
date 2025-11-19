@@ -17,3 +17,18 @@ export function formatPrice(value?: number, currency = 'USD') {
     return `$${amount.toFixed(2)}`
   }
 }
+
+export const generatePreviewPath = ({ pathname }: { pathname: string }) => {
+  const params = {
+    pathname,
+    preview: 'true',
+  }
+
+  const encodedParams = new URLSearchParams()
+
+  Object.entries(params).forEach(([key, value]) => {
+    encodedParams.append(key, value)
+  })
+
+  return `${process.env.NEXT_PUBLIC_URL}/next/preview?${encodedParams.toString()}`
+}
