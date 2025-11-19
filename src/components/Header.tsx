@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button'
 import type { SiteSetting } from '@/payload-types'
+import Link from 'next/link'
 
-export type HeaderContent = Pick<SiteSetting, 'logoText' | 'tagline' | 'navLinks' | 'cta'>
+export type HeaderContent = Pick<SiteSetting, 'logoText' | 'navLinks' | 'cta'>
 
 type HeaderProps = {
   header: HeaderContent
@@ -14,23 +15,19 @@ export function Header({ header, userEmail }: HeaderProps) {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4">
         <div>
           <div className="text-lg font-semibold">{header.logoText}</div>
-          {header.tagline && <p className="text-sm text-muted-foreground">{header.tagline}</p>}
         </div>
         <nav className="hidden gap-6 md:flex">
           {header.navLinks?.map((link) => (
-            <a
+            <Link
               key={link.href}
               className="text-sm text-muted-foreground transition hover:text-foreground"
               href={link.href}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          {userEmail && (
-            <span className="hidden text-sm text-muted-foreground md:inline">Hi, {userEmail}</span>
-          )}
           {header.cta?.href && header.cta?.label && (
             <Button asChild>
               <a href={header.cta.href}>{header.cta.label}</a>
@@ -41,5 +38,3 @@ export function Header({ header, userEmail }: HeaderProps) {
     </header>
   )
 }
-
-

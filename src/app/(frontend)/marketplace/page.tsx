@@ -6,79 +6,29 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Product, ProductImage } from '@/payload-types'
 import config from '@/payload.config'
+import { formatPrice } from '@/lib/utils'
 
-type SearchParams = Promise<{ search?: string | string[] }>
-
-type MarketplaceProduct = {
-  id: string
-  name: string
-  slug: string
-  price: number
-  currency?: string | null
-  shortDescription?: string | null
-  status?: Product['status']
-  imageUrl?: string | null
-}
-
-const FALLBACK_PRODUCTS: MarketplaceProduct[] = [
-  {
-    id: 'placeholder-1',
-    name: 'Artisan Desk Lamp',
-    slug: 'artisan-desk-lamp',
-    price: 129,
-    currency: 'USD',
-    shortDescription: 'Hand-blown glass shade, walnut base, and dimmable controls.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 'placeholder-2',
-    name: 'Ceramic Pour-Over Kit',
-    slug: 'ceramic-pour-over-kit',
-    price: 89,
-    currency: 'USD',
-    shortDescription: 'Barista-grade brewing ritual crafted by small kilns.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 'placeholder-3',
-    name: 'Modular Standing Desk',
-    slug: 'modular-standing-desk',
-    price: 1380,
-    currency: 'USD',
-    shortDescription: 'Powder-coated frame with cable channel and oak desktop.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?auto=format&fit=crop&w=1200&q=80',
-  },
-]
-
-export default async function MarketplacePage({ searchParams }: { searchParams: SearchParams }) {
-  const resolvedParams = await searchParams
-  const search = parseSearch(resolvedParams?.search)
-
+export default async function MarketplacePage() {
   const payloadClient = await getPayload({ config: await config })
   const productsResponse = await payloadClient
     .find({
       collection: 'products',
       depth: 2,
       limit: 24,
-      where: buildSearchClause(search),
       sort: '-updatedAt',
     })
     .catch(() => null)
 
-  const products =
-    productsResponse?.docs?.map((product) => ({
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      price: product.price ?? 0,
-      currency: product.currency ?? 'USD',
-      shortDescription: product.shortDescription,
-      status: product.status,
-      imageUrl: resolveProductImage(product),
-    })) ?? FALLBACK_PRODUCTS
+  const products = productsResponse?.docs?.map((product: Product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price ?? 0,
+    currency: 'USD',
+    description: product.description,
+    status: product.status,
+    imageUrl: product.image?.url,
+  }))
 
   const hasResults = productsResponse?.docs && productsResponse.docs.length > 0
 
@@ -96,21 +46,6 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
             Discover in-stock inventory from vetted makers. Search by product name, tag, or story.
           </p>
         </div>
-        <form className="mx-auto flex w-full max-w-xl flex-col gap-3 rounded-xl border bg-card/50 p-4 shadow-sm sm:flex-row">
-          <label className="sr-only" htmlFor="search">
-            Search catalog
-          </label>
-          <input
-            id="search"
-            name="search"
-            placeholder="Search by product or vendor"
-            defaultValue={search}
-            className="flex-1 rounded-lg border border-input bg-background px-4 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-          <Button type="submit" size="lg">
-            Search
-          </Button>
-        </form>
       </header>
 
       <section>
@@ -142,8 +77,8 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
                   {product.status === 'active' && <Badge>In stock</Badge>}
                   {product.status === 'draft' && <Badge variant="outline">Preview</Badge>}
                 </div>
-                {product.shortDescription && (
-                  <p className="text-sm text-muted-foreground">{product.shortDescription}</p>
+                {product.description && (
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
                 )}
               </CardHeader>
               <CardContent>
@@ -165,59 +100,4 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
       </section>
     </div>
   )
-}
-
-function parseSearch(search?: string | string[]) {
-  if (!search) return ''
-  return Array.isArray(search) ? (search[0] ?? '') : search
-}
-
-function buildSearchClause(search: string) {
-  if (!search) return undefined
-
-  return {
-    or: [
-      {
-        name: {
-          like: search,
-        },
-      },
-      {
-        shortDescription: {
-          like: search,
-        },
-      },
-      {
-        'tags.value': {
-          like: search,
-        },
-      },
-    ],
-  }
-}
-
-function resolveProductImage(product: Product) {
-  const featured = product.image
-  if (featured && typeof featured === 'object' && 'url' in featured) {
-    return (featured as ProductImage).url
-  }
-
-  const galleryItem = product.images?.[0]
-  if (galleryItem && typeof galleryItem === 'object' && 'url' in galleryItem) {
-    return (galleryItem as ProductImage).url
-  }
-  return null
-}
-
-function formatPrice(value?: number, currency = 'USD') {
-  const amount = value ?? 0
-  try {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  } catch {
-    return `$${amount.toFixed(2)}`
-  }
 }

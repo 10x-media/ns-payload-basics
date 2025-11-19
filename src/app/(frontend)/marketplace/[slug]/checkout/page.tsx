@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import config from '@/payload.config'
+import { formatPrice } from '@/lib/utils'
 
 type Params = Promise<{ slug: string }>
 
@@ -125,9 +126,4 @@ export default async function CheckoutPage({ params }: { params: Params }) {
       </div>
     </div>
   )
-}
-
-function formatPrice(value?: number | null) {
-  if (value == null) return '—'
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
 }
