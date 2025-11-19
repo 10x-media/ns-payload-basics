@@ -8,7 +8,7 @@ export async function sendOrderConfirmationEmailHook({ doc, req }: { doc: Order;
   try {
     invoice = await payload.findByID({
       collection: 'invoice-documents',
-      id: doc.invoice?.id || doc.invoice,
+      id: typeof doc.invoice === 'string' ? doc.invoice : doc.invoice?.id,
       depth: 0,
     })
   } catch (error) {

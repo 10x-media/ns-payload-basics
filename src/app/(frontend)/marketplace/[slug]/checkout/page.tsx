@@ -91,7 +91,7 @@ export default async function CheckoutPage({ params }: { params: Params }) {
       redirect(`/marketplace/${productSlug}/checkout?error=stripe_not_configured`)
     }
 
-    const stripe = new Stripe(stripeSecret, { apiVersion: '2022-08-01' })
+    const stripe = new Stripe(stripeSecret, { apiVersion: '2025-10-29.clover' })
     const origin = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
 
     const unitPrice = fetched.price ?? 0
@@ -265,8 +265,8 @@ export default async function CheckoutPage({ params }: { params: Params }) {
                 Continue to payment
               </Button>
               <p className="text-xs text-muted-foreground">
-                You'll be redirected to Stripe's secure checkout page. Your order will be created
-                before payment.
+                You&apos;ll be redirected to Stripe&apos;s secure checkout page. Your order will be
+                created before payment.
               </p>
             </CardFooter>
           </form>

@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { RenderBlocks } from '@/components/RenderBlocks'
 import { Page } from '@/payload-types'
+import { draftMode } from 'next/headers'
 
 type Props = {
   params: Promise<{
@@ -17,8 +18,11 @@ export default async function DynamicPage({ params }: Props) {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
+  const { isEnabled: draftModeEnabled } = await draftMode()
+
   const pages = await payload.find({
     collection: 'pages',
+    draft: draftModeEnabled,
     where: {
       slug: {
         equals: slug,
@@ -36,20 +40,3 @@ export default async function DynamicPage({ params }: Props) {
     </div>
   )
 }
-
-export async function generateStaticParams() {
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-
-  const pages = await payload.find({
-    collection: 'pages',
-    limit: 100,
-    depth: 0,
-  })
-
-  return pages.docs.map((page: Page) => ({
-    segments: page.slug.split('/').filter(Boolean),
-  }))
-}
-
-export const revalidate = 60 // Revalidate every 60 seconds

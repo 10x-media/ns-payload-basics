@@ -17,7 +17,7 @@ export async function reduceInventoryHook({
   for (const lineItem of doc.lineItems) {
     const docs = await payload.find({
       collection: 'products',
-      id: lineItem.product?.id || lineItem.product,
+      id: typeof lineItem.product === 'string' ? lineItem.product : lineItem.product?.id,
     })
     const product = docs?.docs?.[0]
     console.log(product)

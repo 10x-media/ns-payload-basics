@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import axios, { type AxiosResponse } from 'axios'
+// @ts-expect-error - EJS is not typed
 import ejs from 'ejs'
 
 import { Order } from '@/payload-types'
@@ -35,7 +36,7 @@ export async function generateInvoiceDocumentHook({ data, req }: { data: Order; 
     },
   })
 
-  let printData = {
+  const printData = {
     landscape: false,
     html: html,
     format: 'A4',

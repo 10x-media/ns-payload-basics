@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { HeroSection } from '@/blocks/HeroSection'
 import { MarketplaceShowcase } from '@/blocks/MarketplaceShowcase'
 import { TestimonialsSection } from '@/blocks/TestimonialsSection'
+import { generatePreviewPath } from '@/lib/utils'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -19,7 +20,7 @@ export const Pages: CollectionConfig = {
       url: async ({ data, req }) => {
         if (!data?.site || !data?.slug) return ''
 
-        const pathname = data.slug === 'index' ? '/' : `/${data.slug}`
+        const pathname = data.slug === 'home' ? '/' : `/${data.slug}`
 
         return generatePreviewPath({ pathname })
       },

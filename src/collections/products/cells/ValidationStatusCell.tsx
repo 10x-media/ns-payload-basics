@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import type { Props } from 'payload/components/views/Cell'
 
-export const ValidationStatusCell: React.FC<Props> = ({ cellData }) => {
+export const ValidationStatusCell: React.FC<any> = ({ cellData }) => {
   const status = cellData as string | undefined
 
   if (!status) {
@@ -53,4 +52,3 @@ export const ValidationStatusCell: React.FC<Props> = ({ cellData }) => {
     </span>
   )
 }
-
