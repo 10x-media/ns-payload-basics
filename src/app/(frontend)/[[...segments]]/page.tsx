@@ -23,6 +23,7 @@ export default async function DynamicPage({ params }: Props) {
   const pages = await payload.find({
     collection: 'pages',
     draft: draftModeEnabled,
+    overrideAccess: draftModeEnabled,
     where: {
       slug: {
         equals: slug,

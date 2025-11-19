@@ -17,13 +17,17 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: async ({ data, req }) => {
-        if (!data?.site || !data?.slug) return ''
+      url: ({ data }) => {
+        if (!data?.slug) return ''
 
         const pathname = data.slug === 'home' ? '/' : `/${data.slug}`
 
         return generatePreviewPath({ pathname })
       },
+    },
+    preview: (data) => {
+      const pathname = data.slug === 'home' ? '/' : `/${data.slug}`
+      return generatePreviewPath({ pathname })
     },
   },
   versions: {

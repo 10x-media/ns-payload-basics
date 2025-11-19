@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { generateSignedToken } from './signedToken'
+import { stringify } from 'qs-esm'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -18,17 +20,23 @@ export function formatPrice(value?: number, currency = 'USD') {
   }
 }
 
-export const generatePreviewPath = ({ pathname }: { pathname: string }) => {
-  const params = {
+export const generatePreviewPath = ({
+  pathname,
+  withToken = true,
+}: {
+  pathname: string
+  withToken?: boolean
+}) => {
+  const queryParams: Record<string, string> = {
     pathname,
-    preview: 'true',
   }
 
-  const encodedParams = new URLSearchParams()
+  if (withToken) {
+    const token = generateSignedToken({
+      scope: 'preview',
+    })
+    queryParams.token = token
+  }
 
-  Object.entries(params).forEach(([key, value]) => {
-    encodedParams.append(key, value)
-  })
-
-  return `${process.env.NEXT_PUBLIC_URL}/next/preview?${encodedParams.toString()}`
+  return `${process.env.NEXT_PUBLIC_URL}/next/preview?${stringify(queryParams)}`
 }
